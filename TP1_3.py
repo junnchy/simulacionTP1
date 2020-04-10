@@ -13,6 +13,11 @@ class Ruleta(object):
         self.varianzas = []
         self.desvios = []
         self.nroTirada =[]
+        self.frecuenciaRelativaA = []
+        self.vpA = []
+        self.varianzasA = []
+        self.desviosA = []
+        self.nroTiradaA =[]
         self.ocurrencias = 0
         self.acumRelativas = 0
         self.acumResultados = 0
@@ -20,26 +25,25 @@ class Ruleta(object):
         self.acumVar = 0
         self.varEsp = 0
         self.desEsp = 0
+        self.colores = ['darkblue','darkorange','forestgreen','darkorchid','r']
 
-    def tirar(self, n, esperado):
+    def tirar(self, n, e):
         self.tiradas = n
-        self.esperado = esperado
-        for i in range(n+1):
-            if i == 0:
-                pass
-            else:
-                x = randint(0, 36)
-                self.resultados.append(x)
-                self.frt(i, x, esperado)
-                self.vpt(i,x)
-                self.varianza(i,x)
-        print('Resultados: ', self.resultados)
-        print(len(self.nroTirada), len(self.vp), len(self.frecuenciaRelativa))
-        print(pd.DataFrame(self.frecuenciaRelativa))
-        self.fa()
-        self.calculosFinales()
+        for esperado in e:
+            self.esperado = esperado
+            for i in range(n+1):
+                if i == 0:
+                    pass
+                else:
+                    x = randint(0, 36)
+                    self.resultados.append(x)
+                    self.frt(i, x, esperado)
+                    self.vpt(i,x)
+                    self.varianza(i,x)
+            self.fa()
+            self.calculosFinales()
+            self.reiniciar()
         self.imprimirGraficos()
-        print('Frecuencia Relativa esperada: ', self.acumRelativas)
 
     #Fecuencia por tirada
     def frt(self, i , x, esperado):
@@ -76,7 +80,6 @@ class Ruleta(object):
         a = pd.Series(self.resultados).value_counts()
         b = pd.DataFrame(a)
         b.columns = ['Cantidad']
-        print(b.loc[[self.esperado]])
 
     #calculos finales
     def calculosFinales(self):
@@ -95,36 +98,56 @@ class Ruleta(object):
         self.varEsp = aux2/37
         self.desEsp = sqrt(self.varEsp)
 
+    def reiniciar(self):
+
+        self.frecuenciaRelativaA.append(self.frecuenciaRelativa)
+        self.vpA.append(self.vp)
+        self.varianzasA.append(self.varianzas)
+        self.desviosA.append(self.desvios)
+        self.nroTiradaA.append(self.nroTirada)
+
+        self.resultados = []
+        self.frecuenciaRelativa = []
+        self.vp = []
+        self.varianzas = []
+        self.desvios = []
+        self.nroTirada =[]
+        self.ocurrencias = 0
+        self.acumRelativas = 0
+        self.acumResultados = 0
+        self.promedio = 0
+        self.acumVar = 0
+        self.varEsp = 0
+        self.desEsp = 0
 
     def imprimirGraficos(self):
 
         #Graficos
         plt.title('Graficos')
-
         plt.subplot(2, 2, 1)
-        plt.plot(self.nroTirada, self.frecuenciaRelativa, color='darkblue')
-        plt.axhline(y=self.acumRelativas, color='r', linestyle='-')
+        for p in range(len(self.nroTiradaA)):
+            plt.plot(self.nroTiradaA[p], self.frecuenciaRelativaA[p], color=self.colores[p])
         plt.xlabel('n (numero de tiradas)')
         plt.ylabel('fr (frecuencia relativa)')
 
         plt.subplot(2, 2, 2)
-        plt.plot(self.nroTirada, self.vp, color='darkorange')
-        plt.axhline(y=self.promedio, color='r', linestyle='-')
+        for p in range(len(self.nroTiradaA)):
+            plt.plot(self.nroTiradaA[p], self.vpA[p], color=self.colores[p])
         plt.xlabel('n (numero de tiradas)')
         plt.ylabel('VP(Valor Promedio de las Tiradas)')
 
-
         plt.subplot(2, 2, 3)
-        plt.plot(self.nroTirada, self.desvios, color='forestgreen')
-        plt.axhline(y=self.desEsp, color='r', linestyle='-')
+        for p in range(len(self.nroTiradaA)):
+            plt.plot(self.nroTiradaA[p], self.desviosA[p], color=self.colores[p])
         plt.xlabel('n (numero de tiradas)')
         plt.ylabel('Desvio')
 
         plt.subplot(2, 2, 4)
-        plt.plot(self.nroTirada, self.varianzas, color='darkorchid')
-        plt.axhline(y=self.varEsp, color='r', linestyle='-')
+        for p in range(len(self.nroTiradaA)):
+            plt.plot(self.nroTiradaA[p], self.varianzasA[p], color=self.colores[p])
         plt.xlabel('n (numero de tiradas)')
         plt.ylabel('Varianza')
+
 
         plt.savefig('full_figure.png')
         plt.show()
@@ -133,7 +156,7 @@ class Ruleta(object):
 
 def main():
     r = Ruleta()
-    r.tirar(10000, 5)
+    r.tirar(10000, [5, 20, 33, 15, 18])
 
 
  
