@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from math import pow
 from math import sqrt
+import numpy as np
 
 class Ruleta(object):
     
@@ -39,7 +40,6 @@ class Ruleta(object):
         self.fa()
         self.calculosFinales()
         self.imprimirGraficos()
-        print('Frecuencia Relativa esperada: ', self.acumRelativas)
 
     #Fecuencia por tirada
     def frt(self, i , x, esperado):
@@ -95,6 +95,12 @@ class Ruleta(object):
         self.varEsp = aux2/37
         self.desEsp = sqrt(self.varEsp)
 
+        print('Resultados')
+        print('Ultima Fecuencia Relativa: ', self.frecuenciaRelativa[self.tiradas - 1],'esperada:', self.acumRelativas)
+        print('Ultimo Promedio: ', self.vp[self.tiradas - 1],'esperado:', self.promedio)
+        print('Ultima Varianza: ', self.varianzas[self.tiradas - 1],'esperada:', self.varEsp)
+        print('Ultimo Desvio: ', self.desvios[self.tiradas - 1],'esperado:', self.desEsp)
+
 
     def imprimirGraficos(self):
 
@@ -126,7 +132,7 @@ class Ruleta(object):
         plt.xlabel('n (numero de tiradas)')
         plt.ylabel('Varianza')
 
-        plt.savefig('full_figure.png')
+        plt.savefig('full_figure_one.png')
         plt.show()
 
 

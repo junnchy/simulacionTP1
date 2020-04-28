@@ -7,6 +7,7 @@ from math import sqrt
 class Ruleta(object):
     
     def __init__(self):
+        #Los arreglos terminados en A son arreglos de arreglos
         self.resultados = []
         self.frecuenciaRelativa = []
         self.vp = []
@@ -25,7 +26,7 @@ class Ruleta(object):
         self.acumVar = 0
         self.varEsp = 0
         self.desEsp = 0
-        self.colores = ['darkblue','darkorange','forestgreen','darkorchid','r']
+        self.colores = ['gold','darkblue','darkorange','forestgreen','darkorchid']
 
     def tirar(self, n, e):
         self.tiradas = n
@@ -41,21 +42,22 @@ class Ruleta(object):
                     self.vpt(i,x)
                     self.varianza(i,x)
             self.fa()
+            self.reiniciar(esperado, e)
             self.calculosFinales()
-            self.reiniciar()
         self.imprimirGraficos()
+        self.imprimirGraficosDeTodos()
 
     #Fecuencia por tirada
     def frt(self, i , x, esperado):
         if x == esperado:
-            self.ocurrencias = self.ocurrencias + 1
+            self.ocurrencias += 1
         if self.ocurrencias != 0:
             aux = self.ocurrencias/i
         else:
             aux = 0
         self.frecuenciaRelativa.append(aux)
         self.nroTirada.append(i)
-        self.acumRelativas = aux + self.acumRelativas
+        self.acumRelativas += aux
 
     #Valor Promedio de las tiradas
     def vpt(self, i, x):
@@ -84,7 +86,9 @@ class Ruleta(object):
     #calculos finales
     def calculosFinales(self):
          #Calculo para la FR
+        print(self.acumRelativas)
         self.acumRelativas = self.acumRelativas / self.tiradas
+
 
         #Calculo del Promedio General
         aux = 0
@@ -98,7 +102,7 @@ class Ruleta(object):
         self.varEsp = aux2/37
         self.desEsp = sqrt(self.varEsp)
 
-    def reiniciar(self):
+    def reiniciar(self, esperado, e):
 
         self.frecuenciaRelativaA.append(self.frecuenciaRelativa)
         self.vpA.append(self.vp)
@@ -113,7 +117,10 @@ class Ruleta(object):
         self.desvios = []
         self.nroTirada =[]
         self.ocurrencias = 0
-        self.acumRelativas = 0
+        if esperado == e[-1]:
+            pass
+        else:
+            self.acumRelativas = 0
         self.acumResultados = 0
         self.promedio = 0
         self.acumVar = 0
@@ -121,35 +128,74 @@ class Ruleta(object):
         self.desEsp = 0
 
     def imprimirGraficos(self):
+        print(self.acumRelativas)
+        print(self.tiradas)
+        #Graficos
+        plt.title('Graficos')
+
+        p = len(self.nroTiradaA) - 1
+
+        plt.subplot(2, 2, 1)
+        plt.plot(self.nroTiradaA[p], self.frecuenciaRelativaA[p], color=self.colores[p])
+        plt.axhline(y=self.acumRelativas, color='r', linestyle='-')
+        plt.xlabel('n (numero de tiradas)')
+        plt.ylabel('fr (frecuencia relativa)')
+
+        plt.subplot(2, 2, 2)
+        plt.plot(self.nroTiradaA[p], self.vpA[p], color=self.colores[p])
+        plt.axhline(y=self.promedio, color='r', linestyle='-')
+        plt.xlabel('n (numero de tiradas)')
+        plt.ylabel('VP(Valor Promedio de las Tiradas)')
+
+
+        plt.subplot(2, 2, 3)
+        plt.plot(self.nroTiradaA[p], self.desviosA[p], color=self.colores[p])
+        plt.axhline(y=self.desEsp, color='r', linestyle='-')
+        plt.xlabel('n (numero de tiradas)')
+        plt.ylabel('Desvio')
+
+        plt.subplot(2, 2, 4)
+        plt.plot(self.nroTiradaA[p], self.varianzasA[p], color=self.colores[p])
+        plt.axhline(y=self.varEsp, color='r', linestyle='-')
+        plt.xlabel('n (numero de tiradas)')
+        plt.ylabel('Varianza')
+
+        plt.savefig('full_figure_one.png')
+        plt.show()
+
+    def imprimirGraficosDeTodos(self):
 
         #Graficos
         plt.title('Graficos')
         plt.subplot(2, 2, 1)
         for p in range(len(self.nroTiradaA)):
             plt.plot(self.nroTiradaA[p], self.frecuenciaRelativaA[p], color=self.colores[p])
+        plt.axhline(y=self.acumRelativas, color='r', linestyle='-')
         plt.xlabel('n (numero de tiradas)')
         plt.ylabel('fr (frecuencia relativa)')
 
         plt.subplot(2, 2, 2)
         for p in range(len(self.nroTiradaA)):
             plt.plot(self.nroTiradaA[p], self.vpA[p], color=self.colores[p])
+        plt.axhline(y=self.promedio, color='r', linestyle='-')
         plt.xlabel('n (numero de tiradas)')
         plt.ylabel('VP(Valor Promedio de las Tiradas)')
 
         plt.subplot(2, 2, 3)
         for p in range(len(self.nroTiradaA)):
             plt.plot(self.nroTiradaA[p], self.desviosA[p], color=self.colores[p])
+        plt.axhline(y=self.desEsp, color='r', linestyle='-')
         plt.xlabel('n (numero de tiradas)')
         plt.ylabel('Desvio')
 
         plt.subplot(2, 2, 4)
         for p in range(len(self.nroTiradaA)):
             plt.plot(self.nroTiradaA[p], self.varianzasA[p], color=self.colores[p])
+        plt.axhline(y=self.varEsp, color='r', linestyle='-')
         plt.xlabel('n (numero de tiradas)')
         plt.ylabel('Varianza')
 
-
-        plt.savefig('full_figure.png')
+        plt.savefig('full_figure_several.png')
         plt.show()
 
 
