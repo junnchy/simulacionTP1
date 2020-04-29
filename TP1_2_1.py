@@ -9,8 +9,9 @@ class Ruleta(object):
         #Los arreglos terminados en A son arreglos de arreglos
         self.resultados = []
         self.apuestas = []
-        self.ganadores =[]
-        self.nro_juego= 0
+        self.ganadores = {}
+        self.listaGanadores =[]
+        self.tiradas= []
         self.panio = {
             'paridad': {
                 'par': [2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36],
@@ -41,19 +42,23 @@ class Ruleta(object):
             },
         }
 
-    def jugar(self):
-        self.definirGanador(self.tirar())
-        print(self.resultados)
-        print(self.ganadores)
+    def jugar(self, n):
+        self.definirGanador(self.tirar(n))
 
-    def tomarApuestas(self, apuestas, nro_juego):
-        for apuesta in apuestas:
-            self.apuestas.append(apuesta)
-        self.nro_juego = nro_juego
 
-    def tirar(self):
+    def tomarApuestas(self, apuestas):
+        if apuestas == [None]:
+            self.apuestas = []
+        else:
+            self.apuestas = []
+            for apuesta in apuestas:
+                self.apuestas.append(apuesta)
+
+
+    def tirar(self,n):
         x = randint(0, 36)
         self.resultados.append(x)
+        self.tiradas.append(n)
         return x
 
     def definirGanador(self, nro):
@@ -95,60 +100,72 @@ class Ruleta(object):
             elif nro in self.panio['columnas']['3']:
                 ganadores.append('c-3')
 
-            self.ganadores.append(ganadores)
+            self.ganadores = ganadores
+            self.listaGanadores.append(ganadores)
 
     def pagar(self):
-        print('nro j',self.nro_juego)
-        print('ganador',self.ganadores)
-        print('apuestas de jugadores', self.apuestas)
-        for apuesta in self.apuestas:
-            if apuesta['apuesta'] in self.ganadores[self.nro_juego]:
-                aux = apuesta['cantidad'] * 2
-                print('gano:', aux)
-                return {'pago': aux, 'nombre': apuesta['nombre']}
-            else:
-                return {'pago': 0, 'nombre': apuesta['nombre']}
+        if self.apuestas is not None:
+            for apuesta in self.apuestas:
+                if apuesta['apuesta'] in self.ganadores:
+                    aux = apuesta['cantidad'] * 2
+                    print('gano:', aux)
+                    return {'pago': aux, 'nombre': apuesta['nombre']}
+                else:
+                    return {'pago': 0, 'nombre': apuesta['nombre']}
+        else:
+            print('No se recibieron apuestas')
 
 
 class Jugador(object,):
 
     def __init__(self, nombre):
-        self.capital = 100000000
+        self.capital = 100000
         self.nombre = nombre
-        self.apuesta = 100
+        self.apuesta = 1
         self.evolucionCapital = []
         self.ganancias = []
         self.resultados = []
         self.apuestas =[]
         self.nroJuego = []
+        self.ganadoxt = []
+        self.juega = True
         self.j = 0
 
+    def continua(self):
+        return self.juega
+
     def apostar(self):
-        self.j += 1
-        self.nroJuego.append(self.j)
-        if self.capital >= self.apuesta:
-            self.capital -= self.apuesta
-            self.apuestas.append(self.apuesta)
-            return {
-                'apuesta': 'par',
-                'cantidad': self.apuesta,
-                'nombre': self.nombre
-            }
+        if self.juega:
+            if self.capital >= self.apuesta:
+                self.j += 1
+                self.nroJuego.append(self.j)
+                self.capital -= self.apuesta
+                self.apuestas.append(self.apuesta)
+                return {
+                    'apuesta': 'par',
+                    'cantidad': self.apuesta,
+                    'nombre': self.nombre
+                }
+            else:
+                print('Ya no queda plata')
+                self.juega = False
         else:
-            print('Ya no queda plata')
+            pass
 
     def tomarGanancia(self, ganancia):
-        if ganancia['pago'] == 0:
-            self.resultados.append('perdi')
-            self.apuesta = self.apuesta * 2
+        if self.juega:
+            if ganancia['pago'] == 0:
+                self.resultados.append('perdi')
+                self.apuesta = self.apuesta * 2
+            else:
+                self.capital = (self.capital - self.apuesta) + ganancia['pago']
+                self.resultados.append('gane')
 
+            self.ganancias.append(ganancia['pago'])
+            self.evolucionCapital.append(self.capital)
+            #self.mostarResultados()
         else:
-            self.capital += ganancia['pago']
-            self.resultados.append('gane')
-
-        self.ganancias.append(ganancia['pago'])
-        self.evolucionCapital.append(self.capital)
-        self.mostarResultados()
+            pass
 
     def mostarResultados(self):
         print('Capital:', self.capital)
@@ -159,19 +176,43 @@ class Jugador(object,):
         print('1...', self.nroJuego)
 
     def imprimirGraficos(self):
-        plt.plot(self.nroJuego, self.evolucionCapital, color='r')
+        print(len(self.nroJuego), self.nroJuego)
+        print(len(self.evolucionCapital), self.evolucionCapital)
+        print(len(self.apuestas), self.apuestas)
+
+        plt.subplot(2, 2, 1)
+        plt.plot(self.nroJuego, self.evolucionCapital, color='darkblue')
         plt.xlabel('n (numero de tiradas)')
         plt.ylabel('CAPITAL')
+
+        plt.subplot(2, 2, 2)
+        plt.plot(self.nroJuego, self.apuestas, color='darkblue')
+        plt.xlabel('n (numero de tiradas)')
+        plt.ylabel('Apuestas')
+
+        plt.subplot(2, 2, 3)
+        plt.plot(self.nroJuego, self.ganancias, color='darkblue')
+        plt.xlabel('n (numero de tiradas)')
+        plt.ylabel('Ganancias')
+
+        plt.subplot(2, 2, 4)
+        plt.plot(self.nroJuego, self.ganadoxt, color='darkblue')
+        plt.xlabel('n (numero de tiradas)')
+        plt.ylabel('Ganancia en cada tirada')
 
         plt.show()
 
 def main():
     r = Ruleta()
     j1 = Jugador('j1')
-    for n in range(20):
-        r.tomarApuestas([j1.apostar()], n)
-        r.jugar()
-        j1.tomarGanancia(r.pagar())
+    for n in range(30):
+        if j1.continua:
+            r.tomarApuestas([j1.apostar()])
+            r.jugar(n)
+            j1.tomarGanancia(r.pagar())
+        else:
+            print('ya no se juega')
+            pass
     j1.imprimirGraficos()
 
 main()
