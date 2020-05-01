@@ -239,7 +239,7 @@ def main():
     #instancias de jugador (Cuarto parametro) => A que apuesta
     j1 = Jugador('j1', 0, 1, 'par')
     j2 = Jugador('j2', 1, 1, 'impar')
-    j3 = Jugador('j2', 0, 1, 'd-3')
+    j3 = Jugador('j3', 0, 1, 'd-3')
 
     jugadores = [j1, j2, j3]
 
