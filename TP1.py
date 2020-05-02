@@ -144,6 +144,7 @@ class Ruleta(object):
         plt.subplot(2, 2, 2)
         plt.plot(self.nroTiradaA[p], self.vpA[p], color=self.colores[p])
         plt.axhline(y=self.promedio, color='r', linestyle='-')
+        plt.grid(True)
         plt.xlabel('n (numero de tiradas)')
         plt.ylabel('VP(Valor Promedio de las Tiradas)')
 
@@ -151,16 +152,19 @@ class Ruleta(object):
         plt.subplot(2, 2, 3)
         plt.plot(self.nroTiradaA[p], self.desviosA[p], color=self.colores[p])
         plt.axhline(y=self.desEsp, color='r', linestyle='-')
+        plt.grid(True)
         plt.xlabel('n (numero de tiradas)')
         plt.ylabel('Desvio')
 
         plt.subplot(2, 2, 4)
         plt.plot(self.nroTiradaA[p], self.varianzasA[p], color=self.colores[p])
         plt.axhline(y=self.varEsp, color='r', linestyle='-')
+        plt.grid(True)
         plt.xlabel('n (numero de tiradas)')
         plt.ylabel('Varianza')
 
-        plt.savefig('full_figure_one.png')
+        x = randint(10000, 99999)
+        plt.savefig('full_figure_one_Tp_1_'+ str(x) +'.png')
         plt.show()
 
     def imprimirGraficosDeTodos(self):
@@ -178,6 +182,7 @@ class Ruleta(object):
         for p in range(len(self.nroTiradaA)):
             plt.plot(self.nroTiradaA[p], self.vpA[p], color=self.colores[p])
         plt.axhline(y=self.promedio, color='r', linestyle='-')
+        plt.grid(True)
         plt.xlabel('n (numero de tiradas)')
         plt.ylabel('VP(Valor Promedio de las Tiradas)')
 
@@ -185,6 +190,7 @@ class Ruleta(object):
         for p in range(len(self.nroTiradaA)):
             plt.plot(self.nroTiradaA[p], self.desviosA[p], color=self.colores[p])
         plt.axhline(y=self.desEsp, color='r', linestyle='-')
+        plt.grid(True)
         plt.xlabel('n (numero de tiradas)')
         plt.ylabel('Desvio')
 
@@ -192,10 +198,12 @@ class Ruleta(object):
         for p in range(len(self.nroTiradaA)):
             plt.plot(self.nroTiradaA[p], self.varianzasA[p], color=self.colores[p])
         plt.axhline(y=self.varEsp, color='r', linestyle='-')
+        plt.grid(True)
         plt.xlabel('n (numero de tiradas)')
         plt.ylabel('Varianza')
 
-        plt.savefig('full_figure_several.png')
+        x = randint(10000, 99999)
+        plt.savefig('full_figure_all_TP_1_'+ str(x) +'.png')
         plt.show()
 
 

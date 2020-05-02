@@ -316,7 +316,7 @@ def main():
     plt.xticks(y_pos, nombres)
 
     x = randint(10000, 99999)
-    nombre = 'figura_TP_1_2' + str(x) + '.png'
+    nombre = 'figura_TP_1_2_' + str(x) + '.png'
     plt.savefig(nombre)
 
     plt.show()
