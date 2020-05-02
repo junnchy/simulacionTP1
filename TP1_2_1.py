@@ -1,6 +1,7 @@
 from random import randint
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class Ruleta(object):
@@ -203,13 +204,16 @@ class Jugador(object,):
 
     def devolverResultados(self):
         if self.tc == 1:
-            return [self.apuestas, self.ganancias, self.nroJuego]
+            return [self.apuestas, self.ganancias, self.nroJuego, [self.ganados, self.perdidos]]
         else:
-            return [self.apuestas, self.ganancias, self.nroJuego, self.evolucionCapital]
+            return [self.apuestas, self.ganancias, self.nroJuego, [self.ganados, self.perdidos], self.evolucionCapital]
 
     def sayName(self):
         if self.jugada == 1:
             return self.nombre, 'Martingala',  self.aque
+
+    def sayNombre(self):
+            return self.nombre
 
     def imprimirGraficos(self):
         print(len(self.nroJuego), self.nroJuego)
@@ -274,6 +278,7 @@ def main():
     plt.xlabel('n (numero de tiradas)')
     plt.ylabel('Apuestas')
     plt.legend(loc = "upper left")
+    plt.title('Apuestas')
 
     plt.subplot(2, 2, 2)
     plt.tight_layout()
@@ -286,14 +291,15 @@ def main():
     plt.xlabel('n (numero de tiradas)')
     plt.ylabel('Ganancias')
     plt.legend(loc = "upper left")
+    plt.title('Ganancias (no acumulativas)')
 
 
     plt.subplot(2, 2, 3)
     aux2 = 0
     for r in jugadores:
         aux = r.devolverResultados()
-        if len(aux)>3:
-            plt.plot(aux[2], aux[0], label= r.sayName(), color=colores[aux2])
+        if len(aux)>4:
+            plt.plot(aux[2], aux[4], label= r.sayName(), color=colores[aux2])
             aux2 += 1
         else:
             pass
@@ -301,6 +307,22 @@ def main():
     plt.xlabel('n (numero de tiradas)')
     plt.ylabel('CAPITAL')
     plt.legend(loc = "upper left")
+    plt.title('Evolucion de Capital')
+
+    plt.subplot(2,2,4)
+    objects = ('Python', 'C++', 'Java', 'Perl', 'Scala', 'Lisp')
+    nombres = []
+    ganados = []
+    aux2 = 0
+    for r in jugadores:
+        aux = r.devolverResultados()
+        nombres.append(r.sayNombre())
+        ganados.append(aux[3][0])
+    y_pos = np.arange(len(nombres))
+    plt.bar(y_pos, ganados, align='center', alpha=0.5)
+    plt.legend(loc = "upper left")
+    plt.title('Ganados Por Jugador')
+    plt.xticks(y_pos, nombres)
 
     plt.show()
 
