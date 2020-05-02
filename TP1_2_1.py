@@ -207,6 +207,10 @@ class Jugador(object,):
         else:
             return [self.apuestas, self.ganancias, self.nroJuego, self.evolucionCapital]
 
+    def sayName(self):
+        if self.jugada == 1:
+            return self.nombre, 'Martingala',  self.aque
+
     def imprimirGraficos(self):
         print(len(self.nroJuego), self.nroJuego)
         print(len(self.evolucionCapital), self.evolucionCapital)
@@ -261,25 +265,42 @@ def main():
     print(resultados)
 
     plt.subplot(2, 2, 1)
-    for r in range(len(resultados)):
-        plt.plot(resultados[r][2], resultados[r][0], color=colores[r])
+    aux2 = 0
+    for r in jugadores:
+        aux = r.devolverResultados()
+        plt.plot(aux[2], aux[0], label= r.sayName(), color=colores[aux2])
+        aux2 += 1
+    plt.grid(True)
     plt.xlabel('n (numero de tiradas)')
     plt.ylabel('Apuestas')
+    plt.legend(loc = "upper left")
 
     plt.subplot(2, 2, 2)
-    for r in range(len(resultados)):
-        plt.plot(resultados[r][2], resultados[r][1], color=colores[r])
+    plt.tight_layout()
+    aux2 = 0
+    for r in jugadores:
+        aux = r.devolverResultados()
+        plt.plot(aux[2], aux[1], label= r.sayName(), color=colores[aux2])
+        aux2 += 1
+    plt.grid(True)
     plt.xlabel('n (numero de tiradas)')
     plt.ylabel('Ganancias')
+    plt.legend(loc = "upper left")
+
 
     plt.subplot(2, 2, 3)
-    for r in range(len(resultados)):
-        if len(resultados[r])>3:
-            plt.plot(resultados[r][2], resultados[r][3], color=colores[r])
+    aux2 = 0
+    for r in jugadores:
+        aux = r.devolverResultados()
+        if len(aux)>3:
+            plt.plot(aux[2], aux[0], label= r.sayName(), color=colores[aux2])
+            aux2 += 1
         else:
             pass
+    plt.grid(True)
     plt.xlabel('n (numero de tiradas)')
     plt.ylabel('CAPITAL')
+    plt.legend(loc = "upper left")
 
     plt.show()
 
