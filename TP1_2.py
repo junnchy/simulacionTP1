@@ -352,7 +352,7 @@ def main():
     plt.grid(True)
     plt.xlabel('n (numero de tiradas)')
     plt.ylabel('CAPITAL')
-    plt.legend(loc="lower left")
+    plt.legend(loc="upper left")
     plt.title('Evolucion de Capital')
 
     plt.subplot(2, 2, 4)
@@ -367,9 +367,8 @@ def main():
     plt.title('Ganados Por Jugador')
     plt.xticks(y_pos, nombres)
 
-    x = randint(10000, 99999)
     plt.tight_layout()
-
+    x = randint(10000, 99999)
     nombre = 'figura_TP_1_2_' + str(x) + '.png'
     plt.savefig(nombre, dpi=my_dpi)
 
