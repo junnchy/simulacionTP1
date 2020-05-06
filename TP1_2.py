@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+from matplotlib.pyplot import figure
+
+
 class Ruleta(object):
 
     def __init__(self):
@@ -104,6 +107,7 @@ class Ruleta(object):
         self.pagos = []
         if self.apuestas is not None:
             for apuesta in self.apuestas:
+                print('ganadores', self.ganadores, 'apuesta', apuesta['apuesta'])
                 if apuesta['apuesta'] in self.ganadores:
                     if apuesta['apuesta'] in self.paga2:
                         aux = apuesta['cantidad'] * 2
@@ -122,7 +126,7 @@ class Ruleta(object):
 class Jugador(object, ):
 
     def __init__(self, nombre, tc, jugada, aque):
-        self.capital = 10000000
+        self.capital = 100
         self.nombre = nombre
         self.apuesta = 1
         self.evolucionCapital = []
@@ -134,7 +138,7 @@ class Jugador(object, ):
         self.ganados = 0
         self.perdidos = 0
         self.jugada = jugada
-        self.aque = aque
+        self.aque = aque #Martingala y Dalembert
         self.tc = tc  # Tipo de capital 0 limitado 1 ilimitado
         self.juega = True
         self.j = 0
@@ -142,8 +146,28 @@ class Jugador(object, ):
     def continua(self):
         return self.juega
 
+    def defineJuagda(self):
+        if self.jugada == 1:
+            return self.apostarMartingala(self.aque)
+        if self.jugada == 2:
+            return self.apostarDalambert(self.aque)
+
     def apostarMartingala(self, valor):
-        if self.juega:
+        if self.nroJuego == []:
+            self.j += 1
+            self.nroJuego.append(self.j)
+            self.capital -= self.apuesta
+            self.apuestas.append(self.apuesta)
+            return {
+                'apuesta': valor,
+                'cantidad': self.apuesta,
+                'nombre': self.nombre
+            }
+        else:
+            if self.resultados[-1] == 'perdi':
+                self.apuesta = self.apuesta * 2
+            else:
+                pass
             if self.capital >= self.apuesta:
                 self.j += 1
                 self.nroJuego.append(self.j)
@@ -158,37 +182,60 @@ class Jugador(object, ):
             else:
                 # print('Ya no queda plata')
                 self.juega = False
+
+    def apostarDalambert(self, valor):
+        if self.nroJuego == []:
+            self.j += 1
+            self.nroJuego.append(self.j)
+            self.capital -= self.apuesta
+            self.apuestas.append(self.apuesta)
+            return {
+                'apuesta': valor,
+                'cantidad': self.apuesta,
+                'nombre': self.nombre
+            }
         else:
-            pass
+            if self.resultados[-1] == 'perdi':
+                self.apuesta = self.apuesta + 1
+            else:
+                pass
+            if self.capital >= self.apuesta:
+                self.j += 1
+                self.nroJuego.append(self.j)
+                self.capital -= self.apuesta
+                self.apuestas.append(self.apuesta)
+
+                return {
+                    'apuesta': valor,
+                    'cantidad': self.apuesta,
+                    'nombre': self.nombre
+                }
+            else:
+                # print('Ya no queda plata')
+                self.juega = False
+
 
     def tomarGanancia(self, ganancia):
-        if self.juega:
-            for pago in ganancia:
-                if pago['nombre'] == self.nombre:
-                    if pago['pago'] == 0:
-                        self.resultados.append('perdi')
-                        self.perdidos += 1
-                        self.apuesta = self.apuesta * 2
-                        if self.tc == 1:
-                            self.capital = self.capital * 2  # Capital limitado
-                        else:
-                            pass
+        for pago in ganancia:
+            if pago['nombre'] == self.nombre:
+                if pago['pago'] == 0:
+                    self.resultados.append('perdi')
+                    self.perdidos += 1
+                    if self.tc == 1:
+                        self.capital = self.capital * 2  # Capital limitado
                     else:
-                        self.capital = (self.capital - self.apuesta) + pago['pago']
-                        self.resultados.append('gane')
-                        self.ganados += 1
-
-                    self.ganancias.append(pago['pago'])
-                    self.evolucionCapital.append(self.capital)
-                    # self.mostarResultados()
+                        pass
                 else:
-                    pass
+                    self.capital = (self.capital) + pago['pago']
+                    self.resultados.append('gane')
+                    self.ganados += 1
+                self.ganancias.append(pago['pago'])
+                self.evolucionCapital.append(self.capital)
+                # self.mostarResultados()
             else:
                 pass
 
     def mostarResultados(self):
-        # print('Capital:', self.capital)
-        # print('Evolucion Capital: ', self.evolucionCapital)
         print('Resultados: ', self.resultados)
         print('Ganancias: ', self.ganancias)
         print('Apuestas: ', self.apuestas)
@@ -196,19 +243,21 @@ class Jugador(object, ):
         print('Ganados:', self.ganados)
         print('Perdidos', self.perdidos)
 
-    def defineJuagda(self):
-        if self.jugada == 1:
-            return self.apostarMartingala(self.aque)
 
     def devolverResultados(self):
         if self.tc == 1:
             return [self.apuestas, self.ganancias, self.nroJuego, [self.ganados, self.perdidos]]
         else:
+            print('Juegos:', self.nroJuego)
+            print('apuestas:', self.apuestas)
+            print('Tamanios:', len(self.nroJuego), len(self.apuestas), len(self.ganancias), len(self.evolucionCapital))
             return [self.apuestas, self.ganancias, self.nroJuego, [self.ganados, self.perdidos], self.evolucionCapital]
 
     def sayName(self):
         if self.jugada == 1:
             return self.nombre, 'Martingala', self.aque
+        if self.jugada == 2:
+            return self.nombre, 'Dalambert', self.aque
 
     def sayNombre(self):
         return self.nombre
@@ -242,13 +291,14 @@ def main():
     r = Ruleta()
     # Instancias de Jugador (Primer parametro) => Nombre
     # Instancias de Jugador (Segundo parametro) => 0 para capital limitado 1 para ilimitado
-    # Instancias de Jugador (Tercer parametro) => Metodologia de apuesta
+    # Instancias de Jugador (Tercer parametro) => Metodologia de apuesta (1)-Martingala // (2)-Dalambert
     # instancias de jugador (Cuarto parametro) => A que apuesta
     j1 = Jugador('j1', 0, 1, 'par')
-    j2 = Jugador('j2', 1, 1, 'impar')
-    j3 = Jugador('j3', 0, 1, 'd-3')
+    j2 = Jugador('j2', 0, 2, 'm-1')
+    j3 = Jugador('j3', 1, 1, 'rojo')
+    j4 = Jugador('j4', 1, 2, 'c-1')
 
-    jugadores = [j1, j2, j3]
+    jugadores = [j1, j2, j3, j4]
 
     for n in range(5):
         apuestas = []
@@ -261,7 +311,9 @@ def main():
             j.tomarGanancia(r.pagar())
     for j in jugadores:
         resultados.append(j.devolverResultados())
-    print(resultados)
+
+    my_dpi=96
+    plt.figure(figsize=(800/my_dpi, 600/my_dpi), dpi=my_dpi)
 
     plt.subplot(2, 2, 1)
     aux2 = 0
@@ -300,7 +352,7 @@ def main():
     plt.grid(True)
     plt.xlabel('n (numero de tiradas)')
     plt.ylabel('CAPITAL')
-    plt.legend(loc="upper left")
+    plt.legend(loc="lower left")
     plt.title('Evolucion de Capital')
 
     plt.subplot(2, 2, 4)
@@ -316,8 +368,10 @@ def main():
     plt.xticks(y_pos, nombres)
 
     x = randint(10000, 99999)
+    plt.tight_layout()
+
     nombre = 'figura_TP_1_2_' + str(x) + '.png'
-    plt.savefig(nombre)
+    plt.savefig(nombre, dpi=my_dpi)
 
     plt.show()
 
