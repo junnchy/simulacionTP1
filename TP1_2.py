@@ -107,7 +107,6 @@ class Ruleta(object):
         self.pagos = []
         if self.apuestas is not None:
             for apuesta in self.apuestas:
-                print('ganadores', self.ganadores, 'apuesta', apuesta['apuesta'])
                 if apuesta['apuesta'] in self.ganadores:
                     if apuesta['apuesta'] in self.paga2:
                         aux = apuesta['cantidad'] * 2
@@ -126,7 +125,7 @@ class Ruleta(object):
 class Jugador(object, ):
 
     def __init__(self, nombre, tc, jugada, aque):
-        self.capital = 100
+        self.capital = 1000
         self.nombre = nombre
         self.apuesta = 1
         self.evolucionCapital = []
@@ -248,9 +247,6 @@ class Jugador(object, ):
         if self.tc == 1:
             return [self.apuestas, self.ganancias, self.nroJuego, [self.ganados, self.perdidos]]
         else:
-            print('Juegos:', self.nroJuego)
-            print('apuestas:', self.apuestas)
-            print('Tamanios:', len(self.nroJuego), len(self.apuestas), len(self.ganancias), len(self.evolucionCapital))
             return [self.apuestas, self.ganancias, self.nroJuego, [self.ganados, self.perdidos], self.evolucionCapital]
 
     def sayName(self):
@@ -277,11 +273,6 @@ class Jugador(object, ):
         plt.xlabel('n (numero de tiradas)')
         plt.ylabel('Ganancias')
 
-        # plt.subplot(2, 2, 3)
-        # plt.plot(self.nroJuego, self.evolucionCapital, color='darkblue')
-        # plt.xlabel('n (numero de tiradas)')
-        # plt.ylabel('CAPITAL')
-
         plt.show()
 
 
@@ -291,7 +282,7 @@ def main():
     r = Ruleta()
     # Instancias de Jugador (Primer parametro) => Nombre
     # Instancias de Jugador (Segundo parametro) => 0 para capital limitado 1 para ilimitado
-    # Instancias de Jugador (Tercer parametro) => Metodologia de apuesta (1)-Martingala // (2)-Dalambert
+    # Instancias de Jugador (Tercer parametro) => Metodologia de apuesta (1)- Martingala // (2)-Dalambert
     # instancias de jugador (Cuarto parametro) => A que apuesta
     j1 = Jugador('j1', 0, 1, 'par')
     j2 = Jugador('j2', 0, 2, 'm-1')
@@ -300,14 +291,13 @@ def main():
 
     jugadores = [j1, j2, j3, j4]
 
-    for n in range(5):
+    for n in range(10):
         apuestas = []
         for j in jugadores:
             apuestas.append(j.defineJuagda())
         r.tomarApuestas(apuestas)
         r.jugar(n)
         for j in jugadores:
-            print(r.pagar())
             j.tomarGanancia(r.pagar())
     for j in jugadores:
         resultados.append(j.devolverResultados())
@@ -351,6 +341,8 @@ def main():
             pass
     plt.grid(True)
     plt.xlabel('n (numero de tiradas)')
+    y = j1.devolverResultados()
+    plt.axhline(y[4][0], color='r', linestyle='-')
     plt.ylabel('CAPITAL')
     plt.legend(loc="upper left")
     plt.title('Evolucion de Capital')
