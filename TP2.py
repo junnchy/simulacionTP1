@@ -45,7 +45,8 @@ class Metodos(object):
             print('Ingrese un numero de largo par, de ', self.c, ' digitos, para el metodo de cuadrados')
 
     def test_series(self, arrayGCL, arrayC):
-        n = 10
+        n = 5
+        f_esp = (n-1)/n**2
         ejex = []
         ejey = []
         rC = {}
@@ -53,6 +54,7 @@ class Metodos(object):
         rR = {}
         rx = {}
         ry = {}
+        nombres =[]
         for i in range(n):
             if i == 0:
                 aux1 = 0
@@ -66,6 +68,7 @@ class Metodos(object):
                 rG[nombre] = 0
                 rC[nombre] = 0
                 rR[nombre] =0
+                nombres.append(nombre)
 
             ny = 'y'+ str(i)
             ejex.append([aux1, aux2, nombrex])
@@ -116,11 +119,27 @@ class Metodos(object):
                         if valy[0] <= par[1] < valy[1]:
                             k = valx[2] + valy[2]
                             rR[k] = rR[k] + 1
+        xo2R = 0
+        xo2C = 0
+        xo2G =0
+        for j in nombres:
+            xo2R += (((n-1) - rR[j])**2)/(n-1)
+            xo2C += (((n-1) - rC[j])**2)/(n-1)
+            xo2G += (((n-1) - rG[j])**2)/(n-1)
 
-        print(self.paresC)
-        print(self.paresGCL)
-        print(ejex)
-        print(ejey)
+
+        print('tamanio random', len(paresRandom))
+        print('tamanio gC', len(self.paresC))
+        # print(self.paresC)
+        # print(self.paresGCL)
+        print(random)
+        print(paresRandom)
+        print('xo2R', xo2R)
+        print('xo2C', xo2C)
+        print('xo2G', xo2G)
+        # print(ejex)
+        # print(ejey)
+        print('esperado: ', f_esp)
         print('test cudadrados', rC)
         print('test Congruencial', rG)
         print('random', rR)
@@ -128,10 +147,12 @@ class Metodos(object):
 
 def main():
     mgcl = Metodos(52, 6, 100, 2)
-    d = {'GCL': mgcl.gcl(), 'Cuadrados': mgcl.cuadrados()}
-    df = pd.DataFrame(data=d)
-    print(df)
+    # d = {'GCL': mgcl.gcl(), 'Cuadrados': mgcl.cuadrados()}
+    # df = pd.DataFrame(data=d)
+    # print(df)
     mgcl.test_series(mgcl.gcl(), mgcl.cuadrados())
 
 
 main()
+
+#bivliografia de utilidad https://es.slideshare.net/hectorperez923/prueba-de-series-exposicin
