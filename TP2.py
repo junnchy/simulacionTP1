@@ -1,5 +1,8 @@
 import pandas as pd
 from random import randint
+import numpy as np
+import matplotlib.pyplot as plt
+
 
 
 class Metodos(object):
@@ -15,10 +18,12 @@ class Metodos(object):
         self.acumulaC.append(s)
         self.acC = []
         self.acGCL = []
+        self.random = []
 
         # arreglos para test
         self.paresGCL = []
         self.paresC = []
+        self.paresRandom = []
 
     def gcl(self):
         for i in range(self.m):
@@ -44,7 +49,13 @@ class Metodos(object):
         else:
             print('Ingrese un numero de largo par, de ', self.c, ' digitos, para el metodo de cuadrados')
 
-    def test_series(self, arrayGCL, arrayC):
+    def generaRamdom(self):
+        for i in range(self.m):
+            self.random.append(randint(0,100)/100)
+        return  self.random
+
+
+    def test_series(self, arrayGCL, arrayC, random):
         n = 5
         f_esp = (n-1)/n**2
         ejex = []
@@ -76,12 +87,6 @@ class Metodos(object):
             rx[nombrex] = 0
             ry[ny] = 0
 
-        random = []
-        for i in range(self.m):
-            random.append(randint(0,100)/100)
-
-        paresRandom = []
-
         for i in range(int(len(arrayC) - 1)):
             self.paresC.append([arrayC[i], arrayC[i + 1]])
 
@@ -89,7 +94,7 @@ class Metodos(object):
             self.paresGCL.append([arrayGCL[i], arrayGCL[i + 1]])
 
         for i in range(int(len(random) - 1)):
-            paresRandom.append([random[i], random[i + 1]])
+            self.paresRandom.append([random[i], random[i + 1]])
 
 
         for par in self.paresC:
@@ -112,7 +117,7 @@ class Metodos(object):
                             k = valx[2] + valy[2]
                             rG[k] = rG[k] + 1
 
-        for par in paresRandom:
+        for par in self.paresRandom:
             for valx in ejex:
                 if valx[0] <= par[0] < valx[1]:
                     for valy in ejey:
@@ -127,30 +132,58 @@ class Metodos(object):
             xo2C += (((n-1) - rC[j])**2)/(n-1)
             xo2G += (((n-1) - rG[j])**2)/(n-1)
 
-
-        print('tamanio random', len(paresRandom))
-        print('tamanio gC', len(self.paresC))
-        # print(self.paresC)
-        # print(self.paresGCL)
-        print(random)
-        print(paresRandom)
         print('xo2R', xo2R)
         print('xo2C', xo2C)
         print('xo2G', xo2G)
-        # print(ejex)
-        # print(ejey)
+        print('pares C ', self.paresC)
+        print('pares GCL ', self.paresGCL)
+        print('paresR', self.paresRandom)
+        print('Nombres', nombres)
         print('esperado: ', f_esp)
         print('test cudadrados', rC)
         print('test Congruencial', rG)
         print('random', rR)
 
+        d = {'GCL': rG, 'Cuadrados': rC, 'Random': rR, 'X02 R': xo2R, 'X02 Cuadrados': xo2C, 'X02 GCL': xo2G, 'Esperado': f_esp}
+        df = pd.DataFrame(data=d)
+        df.to_csv (r'/home/juanchi/Documents/UTN/4to/Simulacion/resultados.csv', index = False, header=True)
+        print (df)
+
+    def testVual(self, arrayGCL, arrayC, random):
+        fig = plt.figure()
+        plt.subplot(2, 2, 1)
+        newdata = np.squeeze(arrayGCL)
+        plt.plot(newdata)
+
+
+        plt.subplot(2, 2, 2)
+        newdata = np.squeeze(arrayC)
+        plt.plot(newdata)
+
+        plt.subplot(2, 2, 3)
+        newdata = np.squeeze(random)
+        plt.plot(newdata)
+
+        ax1 = fig.add_subplot(221)
+        ax2 = fig.add_subplot(222)
+        ax3 = fig.add_subplot(223)
+        ax1.title.set_text('GCL')
+        ax2.title.set_text('Cuadrados')
+        ax3.title.set_text('Randint')
+
+        plt.tight_layout()
+        plt.savefig('TP_2.png')
+        plt.show()
+
+
 
 def main():
     mgcl = Metodos(52, 6, 100, 2)
-    # d = {'GCL': mgcl.gcl(), 'Cuadrados': mgcl.cuadrados()}
-    # df = pd.DataFrame(data=d)
-    # print(df)
-    mgcl.test_series(mgcl.gcl(), mgcl.cuadrados())
+    aGcl = mgcl.gcl()
+    aCua = mgcl.cuadrados()
+    aRan = mgcl.generaRamdom()
+    mgcl.test_series(aGcl, aCua, aRan)
+    mgcl.testVual(aGcl, aCua, aRan)
 
 
 main()
