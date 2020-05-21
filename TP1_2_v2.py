@@ -2,6 +2,7 @@ from random import randint
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 class Ruleta(object):
 
     def __init__(self):
@@ -122,6 +123,7 @@ class Jugador(object, ):
 
     def __init__(self, nombre, tc, jugada, aque):
         self.capital = 1000
+        self.capitalInicial = 1000
         self.nombre = nombre
         self.apuesta = 1
         self.evolucionCapital = []
@@ -133,7 +135,7 @@ class Jugador(object, ):
         self.ganados = 0
         self.perdidos = 0
         self.jugada = jugada
-        self.aque = aque #Martingala y Dalembert
+        self.aque = aque  # Martingala y Dalembert
         self.tc = tc  # Tipo de capital 0 limitado 1 ilimitado
         self.juega = True
         self.j = 0
@@ -213,7 +215,6 @@ class Jugador(object, ):
                 self.juega = False
                 return None
 
-
     def tomarGanancia(self, ganancia):
         for pago in ganancia:
             if pago['nombre'] == self.nombre:
@@ -243,7 +244,6 @@ class Jugador(object, ):
         print('Perdidos', self.perdidos)
         print('evolucion de capital: ', self.evolucionCapital)
 
-
     def devolverResultados(self):
         if self.tc == 1:
             return [self.apuestas, self.ganancias, self.nroJuego, [self.ganados, self.perdidos]]
@@ -259,22 +259,74 @@ class Jugador(object, ):
     def sayNombre(self):
         return self.nombre
 
-    def imprimirGraficos(self):
+    def imprimirGraficos(self, titulo_de_prueba):
         print(len(self.nroJuego), self.nroJuego)
         print(len(self.evolucionCapital), self.evolucionCapital)
         print(len(self.apuestas), self.apuestas)
 
-        plt.subplot(2, 2, 1)
-        plt.plot(self.nroJuego, self.apuestas, color='darkblue')
-        plt.xlabel('n (numero de tiradas)')
-        plt.ylabel('Apuestas')
-
-        plt.subplot(2, 2, 2)
-        plt.plot(self.nroJuego, self.ganancias, color='darkblue')
-        plt.xlabel('n (numero de tiradas)')
-        plt.ylabel('Ganancias')
-
+        plt.plot()
+        plt.title('Evolucion de Capital -'+ titulo_de_prueba)
+        plt.plot(self.nroJuego, self.evolucionCapital, color='darkblue')
+        plt.xlabel('Numero de Juada')
+        plt.ylabel('Capital')
+        plt.axhline(self.capitalInicial, color='r', linestyle='-')
+        plt.tight_layout()
+        x = randint(1000, 9999)
+        nombre = 'figura_TP_1_2_' + titulo_de_prueba + '-' + str(x) + '.png'
+        plt.savefig(nombre)
         plt.show()
+
+
+def prueba1():
+    resultados = []
+    r = Ruleta()
+    j1 = Jugador('j1', 0, 1, 'rojo')
+    tiradas_de_ruleta = 10
+    jugadores = [j1]
+
+    for n in range(tiradas_de_ruleta):
+        apuestas = []
+        for j in jugadores:
+            apuestas.append(j.defineJuagda())
+        r.tomarApuestas(apuestas)
+        r.jugar(n)
+        for j in jugadores:
+            j.tomarGanancia(r.pagar())
+    for j in jugadores:
+        resultados.append(j.devolverResultados())
+        j.mostarResultados()
+        j.imprimirGraficos("Prueba 1")
+
+def prueba2(n):
+    resultados_ruletas = []
+    for t in range(n):
+        r = Ruleta()
+        j1 = Jugador('j1', 0, 1, 'rojo')
+        tiradas_de_ruleta = 24
+        jugadores = [j1]
+        for n in range(tiradas_de_ruleta):
+            apuestas = []
+            for j in jugadores:
+                apuestas.append(j.defineJuagda())
+            r.tomarApuestas(apuestas)
+            r.jugar(n)
+            for j in jugadores:
+                j.tomarGanancia(r.pagar())
+        aux2 = 0
+        for r in jugadores:
+            aux = r.devolverResultados()
+            if len(aux) > 4:
+                plt.plot(aux[2], aux[4], c=np.random.rand(3,))
+                aux2 += 1
+            else:
+                pass
+        plt.grid(True)
+        plt.xlabel('Numero de tirada')
+        # y = j1.devolverResultados()
+        plt.axhline(1000, color='r', linestyle='-')
+        plt.ylabel('Capital')
+        plt.title('Evolucion de Capital')
+    plt.show()
 
 
 def main():
@@ -286,7 +338,6 @@ def main():
     # Instancias de Jugador (Tercer parametro) => Metodologia de apuesta (1)- Martingala // (2)-Dalambert
     # instancias de jugador (Cuarto parametro) => A que apuesta
 
-
     j1 = Jugador('j1', 0, 1, 'par')
     j2 = Jugador('j2', 0, 2, 'm-1')
     j3 = Jugador('j3', 0, 2, 'c-1')
@@ -296,10 +347,10 @@ def main():
 
     jugadas = 1000
 
-    #Capital Finito
+    # Capital Finito
     jugadores = [j1, j2, j3]
 
-    #Capital infinito
+    # Capital infinito
     # jugadores = [j1, j2, j3, j4, j5]
 
     for n in range(jugadas):
@@ -313,8 +364,8 @@ def main():
     for j in jugadores:
         resultados.append(j.devolverResultados())
 
-    my_dpi=96
-    plt.figure(figsize=(800/my_dpi, 600/my_dpi), dpi=my_dpi)
+    my_dpi = 96
+    plt.figure(figsize=(800 / my_dpi, 600 / my_dpi), dpi=my_dpi)
 
     plt.subplot(2, 2, 1)
     aux2 = 0
@@ -381,6 +432,4 @@ def main():
     plt.show()
 
 
-
-
-main()
+prueba2(90)
