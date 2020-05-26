@@ -120,7 +120,7 @@ class Ruleta(object):
 
 class Jugador(object, ):
 
-    def __init__(self, nombre, tc, jugada, aque):
+    def __init__(self, nombre, tc, valorPanio, metodo):
         self.capital = 1000
         self.nombre = nombre
         self.apuesta = 1
@@ -132,8 +132,8 @@ class Jugador(object, ):
         self.ganadoxt = []
         self.ganados = 0
         self.perdidos = 0
-        self.jugada = jugada
-        self.aque = aque #Martingala y Dalembert
+        self.valor_panio = valorPanio
+        self.metodo = metodo #Martingala y Dalembert
         self.tc = tc  # Tipo de capital 0 limitado 1 ilimitado
         self.juega = True
         self.j = 0
@@ -142,10 +142,10 @@ class Jugador(object, ):
         return self.juega
 
     def defineJuagda(self):
-        if self.jugada == 1:
-            return self.apostarMartingala(self.aque)
-        if self.jugada == 2:
-            return self.apostarDalambert(self.aque)
+        if self.valor_panio == 1:
+            return self.apostarMartingala(self.metodo)
+        if self.valor_panio == 2:
+            return self.apostarDalambert(self.metodo)
 
     def apostarMartingala(self, valor):
         if self.nroJuego == []:
@@ -251,10 +251,10 @@ class Jugador(object, ):
             return [self.apuestas, self.ganancias, self.nroJuego, [self.ganados, self.perdidos], self.evolucionCapital]
 
     def sayName(self):
-        if self.jugada == 1:
-            return self.nombre, 'Martingala', self.aque
-        if self.jugada == 2:
-            return self.nombre, 'Dalambert', self.aque
+        if self.valor_panio == 1:
+            return self.nombre, 'Martingala', self.metodo
+        if self.valor_panio == 2:
+            return self.nombre, 'Dalambert', self.metodo
 
     def sayNombre(self):
         return self.nombre
